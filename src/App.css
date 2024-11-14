@@ -1,0 +1,12 @@
+.side {
+    border: 1px solid white;
+    width: 25rem;
+    float: left;
+    z-index: 100;
+}
+
+.close {
+    width: 100%;
+    border: 1px solid white;
+}
+

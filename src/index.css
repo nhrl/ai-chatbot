@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "Jersey";
+    src: url(./fonts/Jersey25-Regular.ttf) format(truetype);
+}
+
+@layer utilities {
+    .custom-scrollbar::-webkit-scrollbar {
+      @apply w-2;
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-track {
+      @apply bg-gray-800;
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      @apply bg-gray-700 rounded;
+    }
+  
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      @apply bg-gray-600;
+    }
+  }
