@@ -24,17 +24,21 @@ function Sidebar({ isOpen, toggleSidebar, chats }: SidebarProps) {
   }, {} as { [key: string]: Chat[] });
 
   return (
-    <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'block' : 'hidden'} fixed inset-0 bg-gray-800 z-10 w-80 mt-20 h-[calc(100vh-80px)]`}>
+    <div
+      className={`fixed inset-y-0 left-0 bg-gray-800 z-10 w-80 mt-20 h-[calc(100vh-80px)] transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
       <div className="flex flex-col h-full">
         {/* Sidebar Header with Toggle Button */}
         <div className="p-4">
-          <RiMenuUnfold2Line 
-            size={35} 
-            className="mx-2 cursor-pointer text-white" 
-            title="Close Sidebar"  
-            onClick={toggleSidebar} 
+          <RiMenuUnfold2Line
+            size={35}
+            className="mx-2 cursor-pointer text-white"
+            title="Close Sidebar"
+            onClick={toggleSidebar}
           />
-        </div>    
+        </div>
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 custom-scrollbar">
@@ -44,8 +48,8 @@ function Sidebar({ isOpen, toggleSidebar, chats }: SidebarProps) {
                 <h3 className="text-gray-400 text-sm font-semibold mb-2">{category}</h3>
                 <ul className="space-y-2">
                   {groupedChats[category].map((chat) => (
-                    <li 
-                      key={chat.id} 
+                    <li
+                      key={chat.id}
                       className="bg-gray-700 p-3 rounded text-white cursor-pointer hover:bg-gray-600"
                     >
                       {chat.name}
