@@ -1,44 +1,73 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 import Sidebar from './Sidebar';
-import { RiMenuUnfold3Line } from "react-icons/ri";
+import { RiMenuUnfold3Line } from 'react-icons/ri';
+
+interface Message {
+  id: number;
+  sender: string;
+  text: string;
+  chatId: number;
+}
 
 function Main() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, sender: "AI", text: "Hello! How can I assist you today?" },
-    { id: 2, sender: "User", text: "Can you explain how to create a ChatGPT-like UI in React?" },
-    { id: 3, sender: "AI", text: "Of course! You can use styled components or CSS frameworks to achieve this." },
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [chats, setChats] = useState([
+    { id: 1, name: 'Chat 1', category: 'Today' },
+    { id: 2, name: 'Chat 2', category: 'Yesterday' },
+    { id: 3, name: 'Chat 3', category: 'Previous 7 Days' },
   ]);
-  const [newMessage, setNewMessage] = useState("");
-
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
-  const chats = [
-    { id: 1, name: "Scrollable Sidebar Example", category: "Today" },
-    { id: 2, name: "Sidebar className Prop Issue", category: "Today" },
-    { id: 3, name: "Dark Mode Icon Styling", category: "Today" },
-    { id: 4, name: "Middleware Ideas", category: "Yesterday" },
-    { id: 5, name: "Middleware Implementation in Express", category: "Yesterday" },
-    { id: 6, name: "Trainer Availability Check", category: "Previous 7 Days" },
-    { id: 7, name: "Save Favorites Data", category: "Previous 7 Days" },
-    { id: 8, name: "Display Exercise Photo Name", category: "Previous 30 Days" },
-    { id: 9, name: "Display Exercise Photo Name", category: "Previous 30 Days" },
-    { id: 10, name: "Display Exercise Photo Name", category: "Previous 30 Days" },
+  const allMessages: Message[] = [
+    { id: 1, sender: 'AI', text: 'Hello from Chat 1!', chatId: 1 },
+    { id: 2, sender: 'User', text: 'How are you?', chatId: 1 },
+    { id: 3, sender: 'AI', text: 'Welcome to Chat 2.', chatId: 2 },
+    { id: 4, sender: 'User', text: 'Tell me more about React.', chatId: 2 },
+    { id: 5, sender: 'AI', text: 'Chat 3 here!', chatId: 3 },
   ];
+
+  
+  useEffect(() => {
+    if (selectedChatId) {
+      setMessages(allMessages.filter((msg) => msg.chatId === selectedChatId));
+    }
+  }, [selectedChatId]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleChatSelect = (chatId: number) => {
+    setSelectedChatId(chatId);
+    setIsSidebarOpen(false);
+  };
+
+  const handleCreateChat = () => {
+    const newChatId = chats.length + 1; 
+    const newChat = { id: newChatId, name: `Chat ${newChatId}`, category: 'Today' };
+    setChats([...chats, newChat]); 
+    setSelectedChatId(newChatId); 
+  };
+
   const handleSendMessage = () => {
-    if (newMessage.trim() !== "") {
-      setMessages([...messages, { id: Date.now(), sender: "User", text: newMessage }]);
-      setNewMessage("");
+    if (newMessage.trim() !== '' && selectedChatId) {
+      const newMsg = {
+        id: Date.now(),
+        sender: 'User',
+        text: newMessage,
+        chatId: selectedChatId,
+      };
+
+      
+      setMessages((prevMessages) => [...prevMessages, newMsg]);
+      setNewMessage('');
     }
   };
 
-  // Automatically scroll to the bottom when messages are updated
   useEffect(() => {
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
@@ -48,7 +77,13 @@ function Main() {
   return (
     <div className="relative flex h-screen overflow-hidden mt-20">
       {/* Sidebar */}
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} chats={chats} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        chats={chats}
+        onChatSelect={handleChatSelect}
+        onCreateChat={handleCreateChat}
+      />
 
       {/* Sidebar Toggle Icon */}
       {!isSidebarOpen && (
@@ -72,24 +107,36 @@ function Main() {
               ref={messageContainerRef}
               className="flex-1 overflow-y-auto space-y-4 mb-4 custom-scrollbar"
             >
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.sender === "User" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`${
-                      message.sender === "User"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-300 dark:bg-gray-700 dark:text-white"
-                    } max-w-md p-3 rounded-lg shadow-md`}
-                  >
-                    {message.text}
-                  </div>
-                </div>
-              ))}
+              {selectedChatId ? (
+                messages.length > 0 ? (
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${
+                        message.sender === 'User' ? 'justify-end' : 'justify-start'
+                      }`}
+                    >
+                      <div
+                        className={`${
+                          message.sender === 'User'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-300 dark:bg-gray-700 dark:text-white'
+                        } max-w-md p-3 rounded-lg shadow-md`}
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 dark:text-gray-400">
+                    No messages yet in this chat.
+                  </p>
+                )
+              ) : (
+                <p className="text-center text-gray-500 dark:text-gray-400">
+                  Select a chat to view messages.
+                </p>
+              )}
             </div>
 
             {/* Input Section */}
@@ -100,10 +147,12 @@ function Main() {
                 placeholder="Type your message..."
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
+                disabled={!selectedChatId}
               />
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 onClick={handleSendMessage}
+                disabled={!selectedChatId}
               >
                 Send
               </button>
