@@ -1,5 +1,6 @@
 import React from 'react';
-import { RiMenuUnfold2Line } from "react-icons/ri";
+import { RiMenuUnfold2Line } from 'react-icons/ri';
+import { MdAddCircleOutline } from 'react-icons/md';
 
 interface Chat {
   id: number;
@@ -11,10 +12,11 @@ interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
   chats: Chat[];
+  onChatSelect: (chatId: number) => void;
+  onCreateChat: () => void;
 }
 
-function Sidebar({ isOpen, toggleSidebar, chats }: SidebarProps) {
-  // Group chats by category
+function Sidebar({ isOpen, toggleSidebar, chats, onChatSelect, onCreateChat }: SidebarProps) {
   const groupedChats = chats.reduce((groups, chat) => {
     if (!groups[chat.category]) {
       groups[chat.category] = [];
@@ -30,17 +32,23 @@ function Sidebar({ isOpen, toggleSidebar, chats }: SidebarProps) {
       }`}
     >
       <div className="flex flex-col h-full">
-        {/* Sidebar Header with Toggle Button */}
-        <div className="p-4">
+        {/* Header with Close and Create Chat Buttons */}
+        <div className="p-4 flex items-center justify-between">
           <RiMenuUnfold2Line
             size={35}
-            className="mx-2 cursor-pointer text-white"
+            className="cursor-pointer text-white"
             title="Close Sidebar"
             onClick={toggleSidebar}
           />
+          <MdAddCircleOutline
+            size={35}
+            className="cursor-pointer text-white hover:text-blue-500"
+            title="Create New Chat"
+            onClick={onCreateChat}
+          />
         </div>
 
-        {/* Scrollable Content */}
+        {/* Chat List */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 custom-scrollbar">
           <ul className="space-y-6">
             {Object.keys(groupedChats).map((category) => (
@@ -50,6 +58,7 @@ function Sidebar({ isOpen, toggleSidebar, chats }: SidebarProps) {
                   {groupedChats[category].map((chat) => (
                     <li
                       key={chat.id}
+                      onClick={() => onChatSelect(chat.id)}
                       className="bg-gray-700 p-3 rounded text-white cursor-pointer hover:bg-gray-600"
                     >
                       {chat.name}
